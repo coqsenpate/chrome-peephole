@@ -1,0 +1,132 @@
+/*@import "lib_layout";*/
+/*@import "scss/mod_reset";*/
+/*@include use_reset;*/
+/*@include use_sprite;*/
+/*@include use_print-href;*/
+/*@include use_clearfix;*/
+/*@include use_layout;*/
+/*@include use_layout_split;*/
+.ios-scrollbar, html {
+  /* iOS style scrollbar */
+}
+.ios-scrollbar::-webkit-scrollbar, html::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+.ios-scrollbar::-webkit-scrollbar-thumb, html::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border: 3px solid #fff;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+}
+.ios-scrollbar:hover::-webkit-scrollbar-thumb, html:hover::-webkit-scrollbar-thumb {
+  background: #bbb;
+}
+
+.hover-item, #file-list-body ul li a:hover {
+  background: rgba(51, 102, 254, 0.15);
+  color: #36f;
+  text-decoration: underline;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+.hover-item a, #file-list-body ul li a:hover a {
+  color: #36f;
+}
+
+html {
+  overflow-y: auto;
+  padding-top: 35px;
+}
+
+body {
+  font-size: 13px;
+  *font-size: small;
+  *font: x-small;
+  font-family: Helvetica, Arial, "Liberation Sans", FreeSans, sans-serif;
+  color: #222222;
+  background: white;
+  line-height: 1.5;
+  width: 300px;
+  background: #fff;
+  margin: 0;
+  overflow: hidden;
+  padding: 3px;
+}
+
+#header {
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  width: 294px;
+  height: 20px;
+  padding: 12px 3px 3px;
+  color: #999;
+  border-bottom: 1px solid #ccc;
+  background: -webkit-gradient(linear, left top, left bottom, from(white), color-stop(0.7, white), to(#e7e7e7));
+}
+#header:after {
+  content: '';
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 1px;
+  left: 0;
+  bottom: -2px;
+  background: #e5e5e5;
+  z-index: 11;
+}
+
+#file-list-body ul {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font-style: normal;
+  font-weight: normal;
+  list-style: none;
+  text-decoration: none;
+  background: transparent;
+  vertical-align: baseline;
+}
+#file-list-body ul ul {
+  margin-top: 1px;
+}
+#file-list-body ul li {
+  margin: 0;
+  padding: 2px 0 1px;
+  position: relative;
+}
+#file-list-body ul li a {
+  text-decoration: none;
+  color: #222222;
+  display: block;
+  padding: 2px 3px;
+}
+#file-list-body ul li:after {
+  content: '';
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 1px;
+  left: 0;
+  top: 0;
+  background: #eee;
+}
+#file-list-body ul li li {
+  padding-left: 20px;
+}
+#file-list-body .dir ul {
+  height: 0;
+  opacity: 0;
+  -webkit-transition: .25s;
+  transition: .15s;
+}
+#file-list-body .dir.open > ul {
+  height: auto;
+  opacity: 1;
+  -webkit-transition: .25s;
+  transition: .15s;
+}
