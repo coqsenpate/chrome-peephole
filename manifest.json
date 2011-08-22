@@ -3,7 +3,7 @@
   "version": "0.2",
   "description": "Show HTML5 stored files through File System API, And enable you to drag and drop files between browser and desktop.",
   "browser_action": {
-    "default_icon": "HTML5_Offline_Storage_32.png",
+    "default_icon": "icon.png",
     "popup": "popup.html"
   },
   "permissions": [
