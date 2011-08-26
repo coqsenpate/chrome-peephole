@@ -1,57 +1,60 @@
-function __FileScope__ () {
-    this.log = function (object) {
+function __FileScope__() {
+    this.log = function(object) {
         if (object instanceof Object) {
-            console.log("FileScope:");
+            console.log('FileScope:');
             console.log(object);
         } else {
-            console.log("FileScope: " + object);
+            console.log('FileScope: ' + object);
         }
     }
 
-    this.fs_init = function (fs) {
+    this.fs_init = function(fs) {
         var self = __FileScope__main;
         self.initialized = true;
         self.fs = fs;
-        self.log("FileSystem Initialized.");
-        chrome.extension.sendRequest({"type" : "init"});
+        self.log('FileSystem Initialized.');
+        chrome.extension.sendRequest({'type' : 'init'});
     }
 
-    this.fs_error = function (e) {
+    this.fs_error = function(e) {
         var self = __FileScope__main;
-        self.log("Error");
+        self.log('Error');
         self.log(e);
     }
 
-    this.fs_list = function () {
+    this.fs_list = function() {
         if (!this.reader)
             this.reader = this.fs.root.createReader();
+            this.log('createReader');
         if (this.busy) {
             // TODO: Should be tested.
-            this.log("COVER: 1");
+            this.log('COVER: 1');
             this.abort = true;
-            this.onabort = function () {
+            this.onabort = function() {
                 this.fs_list();
             }
             return;
         }
         if (this.abort) {
-            this.log("abort");
+            this.log('abort');
             this.busy = false;
             this.abort = false;
             if (this.onabort) {
                 // TODO: Should be tested.
-                this.log("COVER: 2");
+                this.log('COVER: 2');
                 onabort = this.onabort;
                 this.onablort = null;
                 onabort();
             }
             return;
         }
-        this.reader.readEntries(function (results) {
+        this.reader.readEntries(function(results) {
                 var self = __FileScope__main;
                 if (0 == results.length) {
+                    self.log('abort = true');
                     self.abort = true;
                 } else {
+                    self.log('abort = false');
                     for (var i = 0; i < results.length; i++) {
                         if (i != (results.length - 1))
                             self.send_entry(results[i], null);
@@ -61,70 +64,86 @@ function __FileScope__ () {
                                 });
                     }
                 }
-            }, function (e) {
+            }, function(e) {
                 var self = __FileScope__main;
                 // TODO: Should be tested.
-                self.log("COVER: 3");
-                self.fs_error (e);
+                self.log('COVER: 3');
+                self.fs_error(e);
                 self.abort = true;
                 self.fs_list();
             });
     }
 
-    this.fs_chdir = function (dir) {
-        this.log("ChDir: " + dir);
-        if (dir == '..') {
-            var index = this.cwd.lastIndexOf("/", this.cwd.length - 2);
-            this.cwd = this.cwd.substr(0, index + 1);
-        } else {
-            this.cwd += dir + '/';
-        }
-        this.log("Path: " + this.cwd);
+    this.fs_chdir = function(dir) {
+        this.log('ChDir: ' + dir);
         if (this.busy) {
-            this.log("...retry later");
+            this.log('...retry later');
             this.abort = true;
-            this.onabort = function () {
+            this.onabort = function() {
                 this.fs_chdir(dir);
             }
             return;
         }
-        if (this.cwd != '/')
-            chrome.extension.sendRequest({"type": "dir", "name": ".."});
+
         this.busy = true;
-        this.fs.root.getDirectory(this.cwd, {create: false}, function (entry) {
+        this.fs.root.getDirectory(dir, {create: false}, function(entry) {
                 var self = __FileScope__main;
                 self.reader = entry.createReader();
                 self.busy = false;
                 self.abort = false;
                 self.fs_list();
-            }, function (e) {
+            }, function(e) {
                 var self = __FileScope__main;
                 // TODO: Should be tested.
-                self.log("COVER: 4");
-                self.fs_error (e);
+                self.log('COVER: 4');
+                self.fs_error(e);
                 self.abort = true;
                 self.fs_list();
             });
     }
 
-    this.send_entry = function (entry, callback) {
-        var type = entry.isFile ? "file" : "dir";
-        this.log("Send: type=" + type + "; name=" + entry.name + "; url=" +
-                 entry.toURL());
-        chrome.extension.sendRequest({
-                "type": type,
-                "name": entry.name,
-                "url": entry.toURL()
+    this.send_entry = function(entry, callback) {
+        var type = entry.isFile ? 'file' : 'dir';
+        if (entry.isFile) {
+            entry.file(function(newFile) {
+                console.log('Send: ');
+                console.log('  type=' + type);
+                console.log('  name=' + entry.name);
+                console.log('  size=' + newFile.size);
+                console.log('  path=' + entry.fullPath);
+                console.log('  url=' + entry.toURL());
+                chrome.extension.sendRequest({
+                    'type': type,
+                    'name': entry.name,
+                    'size': newFile.size,
+                    'path': entry.fullPath,
+                    'url': entry.toURL()
+                });
             });
+        }else {
+            console.log('Send: ');
+            console.log('  type=' + type);
+            console.log('  name=' + entry.name);
+            console.log('  path=' + entry.fullPath);
+            console.log('  url=' + entry.toURL());
+            chrome.extension.sendRequest({
+                'type': type,
+                'name': entry.name,
+                'path': entry.fullPath,
+                'url': entry.toURL(),
+                'files': null, //Array
+                'ul': null
+            });
+        }
         if (callback)
             callback();
     }
 
-    this._fs_init = function (fs) {
+    this._fs_init = function(fs) {
         __FileScope__main.fs_init(fs);
     }
 
-    this._fs_error = function (e) {
+    this._fs_error = function(e) {
         __FileScope__main.fs_error(e);
     }
 
@@ -132,8 +151,7 @@ function __FileScope__ () {
     this.abort = false;
     this.onabort = null;
     this.reader = null;
-    this.cwd = '/';
-    this.log("Loaded.");
+    this.log('Loaded.');
     // TODO: Choose PERSISTENT or TEMPORARY. HTML5Rocks uses TEMPORARY.
     //window.webkitRequestFileSystem(window.PERSISTENT,
     window.webkitRequestFileSystem(window.TEMPORARY,
