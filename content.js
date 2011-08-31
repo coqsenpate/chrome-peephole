@@ -1,12 +1,5 @@
 function __FileScope__() {
-    this.log = function(object) {
-        if (object instanceof Object) {
-            console.log('FileScope:');
-            console.log(object);
-        } else {
-            console.log('FileScope: ' + object);
-        }
-    }
+    this.log = console.log.bind(console, 'FileScope:');
 
     this.fs_init = function(fs) {
         var self = __FileScope__main;
