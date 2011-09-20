@@ -9,16 +9,21 @@
 <div id="main">
 <header id="header">
 </header>
-<div id="usage"></div>
-<!--Button For Functions---->
-<form method="POST" name="strTypeChange" onSubmit="return strTypeChange()">
-<input type="radio" id="Temporary" name="typeChange" checked/>Temporary<br>
-<input type="radio" id="Persistent" name="typeChange"/>Persistent<br>
-</form>
-<input type="button" id="DeleteAll" value="DeleteAll" />
-<!--
-<input type="button" id="newTab" value="newTab" onclick="window.open('main.html'); window.close"/>
--->
+<!--Usage and Button For Functions-->
+<div id="header-panel">
+<div id="usage-box">Remaining space: <span id="usage">N/A</span></div>
+<div style="float:right;">
+  <input type="button" id="DeleteAll" value="Delete All" />
+</div>
+<label id="label_temporary" class="label_radio checked" for="temporary-radio">
+  <input id="temporary-radio" type="radio" checked/>Temporary
+</label>
+<label id="label_persistent" class="label_radio unchecked" for="persistent-radio">
+  <input id="persistent-radio" type="radio"/>Persistent
+</label>
+<div style="clear:both"></div>
+</div>
+<!--End of buttons for functions-->
 <div id="file-list-body">
 </div>
 </div>

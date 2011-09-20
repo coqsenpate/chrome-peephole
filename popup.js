@@ -16,53 +16,41 @@ function command_show(node, nodeul) {
 
     // Set up the 'li' node for every entry.
     var li = document.createElement('li');
+    var entry = document.createElement('div');
     var a = document.createElement('a');
-    li.setAttribute('class', node.type);
     li.setAttribute('title', node.path);
-    var text = document.createTextNode(node.name);
-    var img = document.createElement('img'); // file dir icon
-    li.appendChild(a);
+    li.appendChild(entry);
+    entry.classList.add(node.type);
+    entry.classList.add('entry');
+    entry.appendChild(a);
+    a.appendChild(document.createTextNode(node.name));
 
     if (node.type == 'file') {
         var divR = document.createElement('div');
-        divR.setAttribute('align', 'right');
-        divR.appendChild(document.createTextNode(node.size + 'B'));
-        img.setAttribute('src', '/images/icon_file.png');
-        img.setAttribute('alt', '[file]');
-        a.appendChild(img);
-        a.appendChild(text);
-        a.appendChild(divR);
+        divR.appendChild(document.createTextNode(set_unit(node.size)));
+        divR.classList.add('size');
+        entry.appendChild(divR);
         a.setAttribute('target', '_');
         a.setAttribute('href', node.url);
     } else {
         // if the node is Dir, ask for the inside of the dir.
-        var img2 = document.createElement('img'); // open close icon
-        img2.setAttribute('src', '/images/icon_arrow_down.png');
-        img2.setAttribute('alt', 'Open');
         node.ul = document.createElement('ul');
         console.log('reqType is dir: ' + node.path);
         li.appendChild(node.ul);
-        img.setAttribute('src', '/images/icon_folder.png');
-        img.setAttribute('alt', '[dir]');
         a.addEventListener('click', function() {
             if (node.isOpened) { // CLOSING
-                img2.setAttribute('src', '/images/icon_arrow_down.png');
-                li.setAttribute('class', 'dir');
+                entry.classList.remove('open');
                 node.isOpened = false;
                 li.removeChild(node.ul);
                 node.ul = document.createElement('ul');
                 li.appendChild(node.ul);
             } else { // OPENING
-                img2.setAttribute('src', '/images/icon_arrow_right.png');
-                li.setAttribute('class', 'dir open');
+                entry.classList.add('open');
                 node.files = [];
                 node.isOpened = true;
                 request_list(node.path);
-        }
+            }
         });
-        a.appendChild(img2);
-        a.appendChild(img);
-        a.appendChild(text);
         a.setAttribute('href', '#');
     }
     nodeul.appendChild(li);
@@ -88,14 +76,21 @@ function clear_field(){
     div.removeChild(rootul);
     rootul = document.createElement('ul');
     div.appendChild(rootul);
-    usageDiv.removeChild(usageText);
-    usageText = document.createTextNode('');
-    usageDiv.appendChild(usageText);
+    usageDiv.innerHTML = '';
 }
 
 function change_type(fstype) {
+    if (!send_request('change_type', fstype, null))
+        return;
+
+    for (var label in {'label_temporary':0, 'label_persistent':0}) {
+        var elem = document.getElementById(label);
+        if (elem) {
+            elem.classList.toggle('checked');
+            elem.classList.toggle('unchecked');
+        }
+    }
     clear_field();
-    send_request('change_type', fstype, null);
 }
 
 function delete_all() {
@@ -132,6 +127,11 @@ function busy_count_up() {
 }
 
 function busy_count_down() {
+    if (busyCount <= 0) {
+        console.log("busy_count_down() unexpectedly called while " +
+                    "busyCount <= 0");
+        return;
+    }
     busyCount--;
     if (busyCount == 0) {
         header.removeChild(headText);
@@ -161,7 +161,7 @@ function get_target_dir(path) {
 }
 
 function send_request(func, param, callbackfunc) {
-    console.log('send_request: ', func);
+    console.log('send_request: ', func, param, busyCount);
     if (busyCount == 0) {
         busy_count_up();
         callback = callbackfunc;
@@ -169,7 +169,9 @@ function send_request(func, param, callbackfunc) {
             'func' : func,
             'param' : param
         });
+        return true;
     }
+    return false;
 }
 
 // div for filelist
@@ -184,7 +186,6 @@ var contentID = 0;
 
 // div for storage size
 var usageDiv = document.getElementById('usage');
-var usageText = document.createTextNode('');
 
 // text for being busy
 var header = document.getElementById('header');
@@ -192,8 +193,8 @@ var headText = document.createTextNode('Peephole');
 header.appendChild(headText);
 
 // set the Temporary/Persistent radio buttons
-var temp = document.getElementById('Temporary');
-var pers = document.getElementById('Persistent');
+var temp = document.getElementById('temporary-radio');
+var pers = document.getElementById('persistent-radio');
 temp.addEventListener('click', function() {
     change_type(window.TEMPORARY);
 });
@@ -218,9 +219,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
             console.log('currentQuotaInBytes: ' + request.quota);
 
             var leftSize = request.quota - request.usage;
-            usageText = document.createTextNode(
-                    'Size left: ' + set_unit(leftSize));
-            usageDiv.appendChild(usageText);
+            usageDiv.innerHTML = set_unit(leftSize);
         }
         else if (request.type == 'show') {
             var current = get_target_dir(request.path);

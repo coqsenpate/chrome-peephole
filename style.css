@@ -99,12 +99,6 @@ body {
   padding: 2px 0 1px;
   position: relative;
 }
-#file-list-body ul li a {
-  text-decoration: none;
-  color: #222222;
-  display: block;
-  padding: 2px 3px;
-}
 #file-list-body ul li:after {
   content: '';
   position: absolute;
@@ -130,3 +124,42 @@ body {
   -webkit-transition: .25s;
   transition: .15s;
 }
+
+/* Temporary additions to make it look better; not really organized */
+#file-list-body ul li .entry {
+  display: -webkit-box;
+  padding: 2px 3px;
+  width: 90%;  /* temporarily */
+}
+#file-list-body ul li .entry a {
+  margin-left: 16px;
+  text-decoration: none;
+  color: #222222;
+  display: block;
+  width: 80%;
+}
+#file-list-body ul li .entry .size {
+  text-align: right;
+  display: block;
+  width: 20%;
+}
+#file-list-body ul li .entry * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#file-list-body .file { background: url(images/icon_file.png) no-repeat 0; }
+#file-list-body .dir { background: url(images/icon_folder.png) no-repeat 0; }
+#file-list-body .dir.open { background: url(images/icon_folder_open.png) no-repeat 0; }
+
+#header-panel {
+  margin: 1px;
+  padding-bottom: 2px;
+  padding-left: 1px;
+}
+#usage-box { margin-left: 2px; }
+#header-panel * { color: #999; }
+#header-panel .label_radio { padding-left: 14px; vertical-align: middle; }
+#header-panel .label_radio input { position:absolute; left:-9999px; }
+#header-panel .checked { background: url(images/green-radio.png) no-repeat; }
+#header-panel .unchecked { background: url(images/white-radio.png) no-repeat; }
