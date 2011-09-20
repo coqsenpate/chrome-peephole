@@ -1,7 +1,7 @@
 {
   "name": "Peephole",
-  "version": "0.2.1",
-  "description": "Show HTML5 stored files through File System API, And enable you to drag and drop files between browser and desktop.",
+  "version": "0.3",
+  "description": "Show HTML5 stored files through File System API.",
   "browser_action": {
     "default_icon": "icon.png",
     "popup": "popup.html"
