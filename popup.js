@@ -95,6 +95,10 @@ function clear_field(){
 }
 
 function change_type(fstype) {
+    if (busyCount > 0) {
+        console.log("change_type is called while busy count is > 0.");
+        return;
+    }
     clear_field();
     send_request('change_type', fstype, null);
 }
@@ -134,18 +138,18 @@ function busy_count_up() {
 
 function busy_count_down() {
     if (busyCount <= 0) {
-        console.log ('busy_count_down() is called while busyCount <= 0');
+        console.log('ERROR: busy_count_down() is called while busyCount <= 0');
         return;
     }
-    
+
     busyCount--;
     if (busyCount == 0) {
         header.removeChild(headText);
         headText = document.createTextNode('Peephole');
         header.appendChild(headText);
-        
-        if(finishedRequestCallback){
-            finishedRequestCallback();    
+
+        if (finishedRequestCallback) {
+            finishedRequestCallback();
         }
     } else if (busyCount < 0) {
         throw 'busyCount goes negative';
@@ -174,15 +178,10 @@ function send_request(func, param, callbackfunc) {
     if (busyCount == 0) {
         busy_count_up();
         finishedRequestCallback = callbackfunc;
-        if (param){
-            chrome.tabs.executeScript(contentID, {
-                code: func + '(' + param + ')'
-            });
-        } else {
-            chrome.tabs.executeScript(contentID, {
-                code: func +'()'
-            });
-        }
+        chrome.tabs.sendRequest(contentID, {
+            'func': func,
+            'param': param
+        });
     }
 }
 
@@ -208,16 +207,8 @@ header.appendChild(headText);
 // set the Temporary/Persistent radio buttons
 var temp = document.getElementById('Temporary');
 var pers = document.getElementById('Persistent');
-temp.addEventListener('click', function() {
-    if (busyCount == 0) {
-        change_type(window.TEMPORARY);
-    }
-});
-pers.addEventListener('click', function() {
-    if (busyCount == 0) {
-        change_type(window.PERSISTENT);
-    }
-});
+temp.addEventListener('click', function() { change_type(window.TEMPORARY); });
+pers.addEventListener('click', function() { change_type(window.PERSISTENT); });
 
 // set the delete butten
 var deleteAll = document.getElementById('DeleteAll');
