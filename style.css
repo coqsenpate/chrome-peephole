@@ -54,6 +54,7 @@ body {
   margin: 0;
   overflow: hidden;
   padding: 3px;
+  min-height: 100px;
 }
 
 #header {
@@ -124,6 +125,9 @@ body {
   -webkit-transition: .25s;
   transition: .15s;
 }
+.hide {
+  visibility: hidden;
+}
 
 /* Temporary additions to make it look better; not really organized */
 #file-list-body ul li .entry {
@@ -158,8 +162,31 @@ body {
   padding-left: 1px;
 }
 #usage-box { margin-left: 2px; }
-#header-panel * { color: #999; }
+#header-panel * { color: #333; }
 #header-panel .label_radio { padding-left: 14px; vertical-align: middle; }
 #header-panel .label_radio input { position:absolute; left:-9999px; }
 #header-panel .checked { background: url(images/green-radio.png) no-repeat; }
 #header-panel .unchecked { background: url(images/white-radio.png) no-repeat; }
+
+#file-list-empty-label {
+  color: #888;
+  text-align: center;
+  line-height: 30px;
+  vertical-align: middle;
+  border-top: solid 1px #ccc;
+}
+
+#delete-all-confirmation {
+  font-weight:bold;
+  color:#333;
+  padding: 10px;
+  position: absolute;
+  top: 30px;
+  left: 25px;
+  width: 240px;
+  background: #fed;
+  z-index: 10;
+  -webkit-border-radius:8px;
+  -moz-border-radius:8px;
+  border-radius:8px;
+}

@@ -3,9 +3,10 @@ var listener = arguments.callee;
 console.log('connected:', arguments);
 
 function show_log(str) {
-    console.log.bind(console, 'Peephole:')(str);
+    console.log.bind(console, 'Peephole (content):')(str);
 }
 
+var debug = false;
 function show_debug(str) {
     if (debug)
         console.log.bind(console, 'Peephole:')(str);
@@ -184,7 +185,6 @@ var busy = false;
 var reader = null;
 var fstype = window.TEMPORARY;
 var fs = null;
-var debug = true;
 show_debug('Loaded.');
 
 window.webkitRequestFileSystem(
