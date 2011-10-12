@@ -1,3 +1,10 @@
+document.addEventListener('DOMContentLoaded', function() {
+chrome.tabs.getSelected(undefined, function(tab) {
+
+function show_log(str) {
+    console.log.bind(console, 'Peephole (popup):')(str);
+}
+
 function request_list(dir) {
     send_request('change_dir', dir + '/', null);
 }
@@ -175,10 +182,14 @@ function get_target_dir(path) {
 
 function send_request(func, param, callbackfunc) {
     console.log('send_request: ', func);
+    if (!port) {
+        console.log('port is not initialized.', port);
+        return;
+    }
     if (busyCount == 0) {
         busy_count_up();
         finishedRequestCallback = callbackfunc;
-        chrome.tabs.sendRequest(contentID, {
+        port.postMessage({
             'func': func,
             'param': param
         });
@@ -193,7 +204,6 @@ div.appendChild(rootul);
 
 var busyCount = 0;
 var finishedRequestCallback = null;
-var contentID = 0;
 
 // div for storage size
 var usageDiv = document.getElementById('usage');
@@ -214,38 +224,52 @@ pers.addEventListener('click', function() { change_type(window.PERSISTENT); });
 var deleteAll = document.getElementById('DeleteAll');
 deleteAll.addEventListener('click', delete_all);
 
-chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-        contentID = sender.tab.id;
-        console.log(request);
-        if (request.type == 'init') {
-            console.log('INITIATED1');
-            command_init();
-        }
-        // show the size of storage use
-        else if (request.type == 'usage') {
-            console.log('currentUsageInBytes: ' + request.usage);
-            console.log('currentQuotaInBytes: ' + request.quota);
+function onMessage(request, sender, sendResponse) {
+    console.log('Peephole (popup): onMessage:' + request.type, request);
+    if (request.type == 'init') {
+        command_init();
+    }
+    // show the size of storage use
+    else if (request.type == 'usage') {
+        console.log('currentUsageInBytes: ' + request.usage);
+        console.log('currentQuotaInBytes: ' + request.quota);
 
-            var leftSize = request.quota - request.usage;
-            usageText = document.createTextNode(
-                    'Size left: ' + get_unit(leftSize));
-            usageDiv.appendChild(usageText);
-        }
-        else if (request.type == 'show') {
-            var current = get_target_dir(request.path);
+        var leftSize = request.quota - request.usage;
+        usageText = document.createTextNode(
+                'Size left: ' + get_unit(leftSize));
+        usageDiv.appendChild(usageText);
+    }
+    else if (request.type == 'show') {
+        var current = get_target_dir(request.path);
 
-            console.log('currentdir: ', current.dir);
+        console.log('currentdir: ', current.dir);
 
-            command_sort(current.dir);
+        command_sort(current.dir);
 
-            // show the contents of currentdir
-            for (var i = 0; i < current.dir.length; i++)
-                command_show(current.dir[i], current.ul);
-        }
-        else if (request.type == 'finished') {
-            busy_count_down();
-        }
-        else
-            command_filedir(request);
-    });
-chrome.tabs.executeScript(null, {file: 'content.js'});
+        // show the contents of currentdir
+        for (var i = 0; i < current.dir.length; i++)
+            command_show(current.dir[i], current.ul);
+    }
+    else if (request.type == 'finished') {
+        busy_count_down();
+    }
+    else {
+        command_filedir(request);
+    }
+    return false;
+}
+
+function onDisconnect() {
+    port = null;
+    console.warning('disconnected');
+}
+
+chrome.tabs.executeScript(tab.id, {file: 'content.js'}, function() {
+    port = chrome.tabs.connect(tab.id);
+    console.log(port);
+    port.onMessage.addListener(onMessage);
+    port.onDisconnect.addListener(onDisconnect);
+});
+
+});  // chrome.tabs.getSelected
+});  // document.addEventListener

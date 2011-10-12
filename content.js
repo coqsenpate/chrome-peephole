@@ -1,3 +1,7 @@
+chrome.extension.onConnect.addListener(function(port) {
+var listener = arguments.callee;
+console.log('connected:', arguments);
+
 function show_log(str) {
     console.log.bind(console, 'Peephole:')(str);
 }
@@ -10,7 +14,7 @@ function show_debug(str) {
 function fs_init(filesystem) {
     fs = filesystem;
     show_debug('FileSystem Initialized.');
-    chrome.extension.sendRequest({'type' : 'init'});
+    port.postMessage({'type' : 'init'});
 }
 
 function fs_error(e) {
@@ -83,7 +87,7 @@ function send_entry(entry) {
 
             show_debug('currentPendingEntries = ' + currentPendingEntries);
             show_debug('Send: ', request);
-            chrome.extension.sendRequest(request);
+            port.postMessage(request);
             check_send_all(entry);
         }.bind(this));
     } else {
@@ -95,14 +99,14 @@ function send_entry(entry) {
         };
         show_debug('currentPendingEntries = ' + currentPendingEntries);
         show_debug('Send: ', request);
-        chrome.extension.sendRequest(request);
+        port.postMessage(request);
         check_send_all(entry);
     }
 }
 
 function check_send_all(entry) {
     if (--currentPendingEntries == 0) {
-        chrome.extension.sendRequest({
+        port.postMessage({
             'path' : entry.fullPath,
             'type' : 'show'
         });
@@ -154,7 +158,7 @@ function check_usage(type) {
     webkitStorageInfo.queryUsageAndQuota(
         fstype,
         function(usage, quota) {
-            chrome.extension.sendRequest({
+            port.postMessage({
             'type' : 'usage',
             'usage': usage,
             'quota': quota
@@ -171,7 +175,7 @@ function start_request() {
 
 function finish_request() {
     busy = false;
-    chrome.extension.sendRequest({
+    port.postMessage({
         'type' : 'finished',
     });
 }
@@ -190,8 +194,8 @@ window.webkitRequestFileSystem(
     fs_error
 );
 
-chrome.extension.onRequest.addListener(
-    function(request, sender, sendResponse) {
+port.onMessage.addListener(
+    function(request) {
         show_debug(request);
         if (request.func == 'init_list') {
             init_list();
@@ -204,5 +208,13 @@ chrome.extension.onRequest.addListener(
         } else {
             show_debug("Got unknown request " + request);
         }
+        return false;
     }
 );
+
+port.onDisconnect.addListener(function() {
+    console.log('disconnected');
+    chrome.extension.onConnect.removeListener(listener);
+    port = null;
+});
+});  // chrome.extension.onConnect
