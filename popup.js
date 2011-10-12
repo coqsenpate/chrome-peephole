@@ -1,9 +1,16 @@
+document.addEventListener('DOMContentLoaded', function() {
+chrome.tabs.getSelected(undefined, function(tab) {
+
+function show_log(str) {
+    console.log.bind(console, 'Peephole (popup):')(str);
+}
+
 function request_list(dir) {
-   send_request('change_dir', dir, null);
+    send_request('change_dir', dir + '/', null);
 }
 
 function command_init() {
-   send_request('init_list', null, null);
+    send_request('init_list', null, null);
 }
 
 function command_filedir(request) {
@@ -13,7 +20,6 @@ function command_filedir(request) {
 }
 
 function command_show(node, nodeul) {
-
     // Set up the 'li' node for every entry.
     var li = document.createElement('li');
     var entry = document.createElement('div');
@@ -27,7 +33,7 @@ function command_show(node, nodeul) {
 
     if (node.type == 'file') {
         var divR = document.createElement('div');
-        divR.appendChild(document.createTextNode(set_unit(node.size)));
+        divR.appendChild(document.createTextNode(get_unit(node.size)));
         divR.classList.add('size');
         entry.appendChild(divR);
         a.setAttribute('target', '_');
@@ -108,7 +114,7 @@ function delete_all() {
     }
 }
 
-function set_unit(size) {
+function get_unit(size) {
     var unit = 0;
     while (size > 1000 && unit < 5) {
         size /= 1000;
@@ -116,7 +122,7 @@ function set_unit(size) {
     }
     if (unit == 5) return 'unlimited';
     size = Math.round(size * 100) / 100;
-    return size + ['', 'k', 'M', 'G', 'T'][unit] + 'B';
+    return size + ['', 'K', 'M', 'G', 'T'][unit] + 'B';
 }
 
 function busy_count_up() {
@@ -128,8 +134,7 @@ function busy_count_up() {
 
 function busy_count_down() {
     if (busyCount <= 0) {
-        console.log("busy_count_down() unexpectedly called while " +
-                    "busyCount <= 0");
+        console.log('ERROR: busy_count_down() is called while busyCount <= 0');
         return;
     }
     busyCount--;
@@ -137,15 +142,15 @@ function busy_count_down() {
         header.removeChild(headText);
         headText = document.createTextNode('Peephole');
         header.appendChild(headText);
-    }
-    if(callback){
-        callback();    
+
+        if (finishedRequestCallback) {
+            finishedRequestCallback();
+        }
     }
 }
 
 function get_target_dir(path) {
     var splitted = path.split('/');
-
     var currentul = rootul;
     var currentdir = rootdir;
     for (var i = 1; i < splitted.length - 1; i++) {
@@ -161,17 +166,19 @@ function get_target_dir(path) {
 }
 
 function send_request(func, param, callbackfunc) {
-    console.log('send_request: ', func, param, busyCount);
+    console.log('send_request: ', func);
+    if (!port) {
+        console.log('port is not initialized.', port);
+        return;
+    }
     if (busyCount == 0) {
         busy_count_up();
-        callback = callbackfunc;
-        chrome.tabs.sendRequest(contentID, {
-            'func' : func,
-            'param' : param
+        finishedRequestCallback = callbackfunc;
+        port.postMessage({
+            'func': func,
+            'param': param
         });
-        return true;
     }
-    return false;
 }
 
 // div for filelist
@@ -181,8 +188,7 @@ var rootul = document.createElement('ul');
 div.appendChild(rootul);
 
 var busyCount = 0;
-var callback = null;
-var contentID = 0;
+var finishedRequestCallback = null;
 
 // div for storage size
 var usageDiv = document.getElementById('usage');
@@ -195,47 +201,55 @@ header.appendChild(headText);
 // set the Temporary/Persistent radio buttons
 var temp = document.getElementById('temporary-radio');
 var pers = document.getElementById('persistent-radio');
-temp.addEventListener('click', function() {
-    change_type(window.TEMPORARY);
-});
-pers.addEventListener('click', function() {
-    change_type(window.PERSISTENT);
-});
+temp.addEventListener('click', function() { change_type(window.TEMPORARY); });
+pers.addEventListener('click', function() { change_type(window.PERSISTENT); });
 
 // set the delete butten
 var deleteAll = document.getElementById('DeleteAll');
 deleteAll.addEventListener('click', delete_all);
 
-chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-        contentID = sender.tab.id;
-        console.log(request);
-        if (request.type == 'init') {
-            console.log('INITIATED1');
-            command_init();
-        }
-        // show the size of storage use
-        else if (request.type == 'usage') {
-            console.log('currentUsageInBytes: ' + request.usage);
-            console.log('currentQuotaInBytes: ' + request.quota);
+function onMessage(request, sender, sendResponse) {
+    console.log('Peephole (popup): onMessage:' + request.type, request);
+    if (request.type == 'init') {
+        command_init();
+    }
+    // show the size of storage use
+    else if (request.type == 'usage') {
+        console.log('currentUsageInBytes: ' + request.usage);
+        console.log('currentQuotaInBytes: ' + request.quota);
 
-            var leftSize = request.quota - request.usage;
-            usageDiv.innerHTML = set_unit(leftSize);
-        }
-        else if (request.type == 'show') {
-            var current = get_target_dir(request.path);
+        var leftSize = request.quota - request.usage;
+        usageDiv.innerHTML = get_unit(leftSize);
+    }
+    else if (request.type == 'show') {
+        var current = get_target_dir(request.path);
+        console.log('currentdir: ', current.dir);
+        command_sort(current.dir);
 
-            console.log('currentdir: ', current.dir);
+        // show the contents of currentdir
+        for (var i = 0; i < current.dir.length; i++)
+            command_show(current.dir[i], current.ul);
+    }
+    else if (request.type == 'finished') {
+        busy_count_down();
+    }
+    else {
+        command_filedir(request);
+    }
+    return false;
+}
 
-            command_sort(current.dir);
+function onDisconnect() {
+    port = null;
+    console.warning('disconnected');
+}
 
-            // show the contents of currentdir
-            for (var i = 0; i < current.dir.length; i++)
-                command_show(current.dir[i], current.ul);
-        }
-        else if (request.type == 'not busy') {
-            busy_count_down();
-        }
-        else
-            command_filedir(request);
-    });
-chrome.tabs.executeScript(null, {file: 'content.js'});
+chrome.tabs.executeScript(tab.id, {file: 'content.js'}, function() {
+    port = chrome.tabs.connect(tab.id);
+    console.log(port);
+    port.onMessage.addListener(onMessage);
+    port.onDisconnect.addListener(onDisconnect);
+});
+
+});  // chrome.tabs.getSelected
+});  // document.addEventListener
