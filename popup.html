@@ -8,8 +8,17 @@
 <body>
 <div id="main">
 <header id="header">
-Peephole
 </header>
+<div id="usage"></div>
+<!--Button For Functions---->
+<form method="POST" name="strTypeChange" onSubmit="return strTypeChange()">
+<input type="radio" id="Temporary" name="typeChange" checked/>Temporary<br>
+<input type="radio" id="Persistent" name="typeChange"/>Persistent<br>
+</form>
+<input type="button" id="DeleteAll" value="DeleteAll" />
+<!--
+<input type="button" id="newTab" value="newTab" onclick="window.open('main.html'); window.close"/>
+-->
 <div id="file-list-body">
 </div>
 </div>
