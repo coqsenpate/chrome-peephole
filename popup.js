@@ -1,6 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
 chrome.tabs.getSelected(undefined, function(tab) {
 
+if (!tab.url.match(/^https?:\/\//)) {
+  document.body.classList.add('unsupported');
+  return;
+}
+
 function show_log(str) {
     console.log.bind(console, 'Peephole (popup):')(str);
 }

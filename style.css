@@ -190,3 +190,15 @@ body {
   -moz-border-radius:8px;
   border-radius:8px;
 }
+
+#unsupported-message {
+  display: none;
+}
+
+.unsupported > #unsupported-message {
+  display: block;
+}
+
+.unsupported > #main {
+  display: none;
+}
