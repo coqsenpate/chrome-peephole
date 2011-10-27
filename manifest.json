@@ -1,12 +1,12 @@
 {
   "name": "Peephole",
-  "version": "0.6",
+  "version": "0.7",
   "description": "Show HTML5 stored files through File System API.",
   "browser_action": {
     "default_icon": "icon.png",
     "popup": "popup.html"
   },
   "permissions": [
-    "tabs", "http://*/*", "https://*/*", "file://*", "ftp://*/*"
+    "tabs", "http://*/*", "https://*/*"
   ]
 }
