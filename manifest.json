@@ -1,12 +1,13 @@
 {
   "name": "HTML5 FileSystem Explorer",
-  "version": "0.71",
+  "version": "0.72",
   "description": "Show HTML5 stored files through File System API.",
   "browser_action": {
     "default_icon": "icon.png",
-    "popup": "popup.html"
+    "default_popup": "popup.html"
   },
   "permissions": [
-    "tabs", "http://*/*", "https://*/*"
-  ]
+    "tabs", "http://*/*", "https://*/*", "file://*/*"
+  ],
+  "manifest_version": 2
 }

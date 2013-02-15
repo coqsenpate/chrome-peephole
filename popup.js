@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
 chrome.tabs.getSelected(undefined, function(tab) {
 
-if (!tab.url.match(/^https?:\/\//)) {
+if (!(tab.url.match(/^https?:\/\//) || tab.url.match(/^file:\/\//))) {
   document.body.classList.add('unsupported');
   return;
 }
