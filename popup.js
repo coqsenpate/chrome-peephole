@@ -33,6 +33,45 @@ function command_filedir(request) {
     current.dir.push(request);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function command_show(node, nodeul) {
     // Set up the 'li' node for every entry.
     var li = document.createElement('li');
@@ -45,7 +84,6 @@ function command_show(node, nodeul) {
     entry.classList.add('entry');
     entry.appendChild(a);
     a.appendChild(document.createTextNode(node.name));
-    aDelete.setAttribute('class', 'fa fa-times');
 
     if (node.type == 'file') {
         var divR = document.createElement('div');
@@ -75,9 +113,39 @@ function command_show(node, nodeul) {
         });
         a.setAttribute('href', '#');
     }
-    nodeul.appendChild(li);
+    aDelete.setAttribute('class', 'fa fa-times deleteButton');
+    aDelete.setAttribute('data-path', node.path);
     li.appendChild(aDelete);
+    nodeul.appendChild(li);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function command_sort(dir) {
     dir.sort(function(a, b) {
@@ -216,12 +284,96 @@ var header = document.getElementById('header');
 var headText = document.createTextNode('Peephole');
 header.appendChild(headText);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // set the Temporary/Persistent radio buttons
 var current_fstype = window.TEMPORARY;
 var temp = document.getElementById('temporary-radio');
 var pers = document.getElementById('persistent-radio');
+var del = document.getElementById('file-list-body');
 temp.addEventListener('click', function() { change_type(window.TEMPORARY); });
 pers.addEventListener('click', function() { change_type(window.PERSISTENT); });
+del.addEventListener('click', function(e)
+{
+	if (e.target.className.match(/deleteButton/))
+	{
+		console.log(e);
+		tmp = e.target.dataset.path;
+		send_request('delete_single', tmp, function(){
+    		clear_field();
+			command_init();
+		})
+
+	};
+
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // set the delete butten
 var deleteAll = document.getElementById('delete-all');

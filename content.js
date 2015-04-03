@@ -6,7 +6,7 @@ function show_log(str) {
     console.log.bind(console, 'Peephole (content):')(str);
 }
 
-var debug = false;
+var debug = true;
 function show_debug(str) {
     if (debug)
         console.log.bind(console, 'Peephole:')(str);
@@ -128,6 +128,37 @@ function change_type(type) {
         fs_error_and_finish_request);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function delete_single(path){
+    show_debug('delete_single');
+    if (!start_request()) return;
+		fs.root.getFile(path, {create: false}, function(entry){
+			remove_file(entry);
+            finish_request();
+		}, function(e) {
+            fs_error_and_finish_request(e);
+		});
+}
+
+
+
 function delete_all() {
     show_debug('delete_all');
     if (!start_request()) return;
@@ -138,20 +169,57 @@ function delete_all() {
 }
 
 // Called only from delete_all.
-function remove_file(entry) {
+function remove_file(entry, callback) {
     if (!busy) throw 'remove_file is called without lock.';
 
     show_debug('remove entry');
     if (entry.isFile) {
         entry.remove(function() {
             show_debug('File Removed');
+            if (callback){
+            	callback();
+            }
         }, fs_error);
     } else {
         entry.removeRecursively(function() {
             show_debug('Dir Removed');
+            if (callback){
+            	callback();
+            }
         }, fs_error);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function check_usage(type) {
     fstype = type;
@@ -205,6 +273,8 @@ port.onMessage.addListener(
             change_type(request.param);
         } else if (request.func == 'delete_all') {
             delete_all();
+        } else if (request.func == 'delete_single') {
+            delete_single(request.param);
         } else {
             show_debug("Got unknown request " + request);
         }
