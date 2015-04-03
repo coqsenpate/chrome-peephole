@@ -149,12 +149,31 @@ function change_type(type) {
 function delete_single(path){
     show_debug('delete_single');
     if (!start_request()) return;
-		fs.root.getFile(path, {create: false}, function(entry){
-			remove_file(entry);
-            finish_request();
-		}, function(e) {
-            fs_error_and_finish_request(e);
+
+	fs.root.getFile(path, {create: false}, function(entry){
+		remove_file(entry, function(){
+        	finish_request();
 		});
+        finish_request();
+	}, function(e) {
+		if (e.name == 'TypeMismatchError')
+		{
+			fs.root.getDirectory(path, {create: false}, function(entry)
+			{
+				remove_file(entry, function(){
+	            	finish_request();
+				});
+			},
+			function(e)
+			{
+    			fs_error_and_finish_request(e);
+			});
+		}
+		else
+		{
+			fs_error_and_finish_request(e);
+		}
+	});
 }
 
 
@@ -176,14 +195,14 @@ function remove_file(entry, callback) {
     if (entry.isFile) {
         entry.remove(function() {
             show_debug('File Removed');
-            if (callback){
+            if(callback){
             	callback();
             }
         }, fs_error);
     } else {
         entry.removeRecursively(function() {
             show_debug('Dir Removed');
-            if (callback){
+            if(callback){
             	callback();
             }
         }, fs_error);
