@@ -38,12 +38,14 @@ function command_show(node, nodeul) {
     var li = document.createElement('li');
     var entry = document.createElement('div');
     var a = document.createElement('a');
+    var aDelete = document.createElement('a');
     li.setAttribute('title', node.path);
     li.appendChild(entry);
     entry.classList.add(node.type);
     entry.classList.add('entry');
     entry.appendChild(a);
     a.appendChild(document.createTextNode(node.name));
+    aDelete.setAttribute('class', 'fa fa-times');
 
     if (node.type == 'file') {
         var divR = document.createElement('div');
@@ -74,6 +76,7 @@ function command_show(node, nodeul) {
         a.setAttribute('href', '#');
     }
     nodeul.appendChild(li);
+    li.appendChild(aDelete);
 }
 
 function command_sort(dir) {

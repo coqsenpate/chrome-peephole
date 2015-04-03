@@ -1,0 +1,14 @@
+elle doit permettre de naviguer dans les fichiers de la page en cours (liés au file systeme).
+Il y a une API implementer par chrome, qui permet d avoir des fichiers persistant.
+Lister les dossier, les fichiers, naviguer dedans.
+Permettre de supprimer un fichier particulier.
+Pouvoir ouvrir un fichier particulier dans un nouvel onglet.
+Si possible, deplacer et copier des fichiers/repertoires.
+Avoir qq stats (disk usage, disk space available)
+
+Il existe une extension simillaire mais pas tres pratique.
+
+
+- Regarder comment faire une extension chrome.
+- Etudier l API
+- Idealement, un affichage persistant
