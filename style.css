@@ -135,26 +135,51 @@ body {
   padding: 2px 3px;
   width: 90%;  /* temporarily */
 }
-#file-list-body ul li .entry a {
-  margin-left: 16px;
-  text-decoration: none;
-  color: #222222;
-  display: block;
-  width: 80%;
+
+#file-list-body ul li .entry .deleteButton {
+	padding-top: 5px;
+	display:block;
+	background: url(images/icon_delete.png) no-repeat 0;
+	height:14px;
+  width: 5%;
 }
+
+#file-list-body ul li .entry .deleteButton:hover {
+	display:block;
+	background: url(images/icon_delete.png) no-repeat 0;
+	background-color: #C8C8C8;
+	height:14px;
+  width: 5%;
+}
+
 #file-list-body ul li .entry .size {
   text-align: right;
   display: block;
   width: 20%;
 }
+
+#file-list-body ul li .entry a {
+  margin-left: 16px;
+  text-decoration: none;
+  color: #222222;
+  display: block;
+  width: 70%;
+}
+
 #file-list-body ul li .entry * {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-#file-list-body .file { background: url(images/icon_file.png) no-repeat 0; }
-#file-list-body .dir { background: url(images/icon_folder.png) no-repeat 0; }
-#file-list-body .dir.open { background: url(images/icon_folder_open.png) no-repeat 0; }
+#file-list-body .file {
+	background: url(images/icon_file.png) no-repeat 0;
+}
+#file-list-body .dir {
+	background: url(images/icon_folder.png) no-repeat 0;
+}
+#file-list-body .dir.open {
+	background: url(images/icon_folder_open.png) no-repeat 0;
+}
 
 #header-panel {
   margin: 1px;

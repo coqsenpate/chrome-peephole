@@ -7,7 +7,7 @@ function show_log(str) {
 }
 
 
-var debug = false; // set debug mode on/off
+var debug = true; // set debug mode on/off
 
 
 function show_debug(str) {
@@ -134,30 +134,42 @@ function change_type(type) {
 
 function delete_single(path){
     show_debug('delete_single');
+    // alert('je suis dans delete_single');
     if (!start_request()) return;
 
 	fs.root.getFile(path, {create: false}, function(entry){
 		remove_file(entry, function(){
+			// alert('je termine correctement');
+			path='';
         	finish_request();
 		});
-        finish_request();
-	}, function(e) {
-		if (e.name == 'TypeMismatchError')
+        // finish_request();
+	}, function(error) {
+		if (error.name == 'TypeMismatchError')
 		{
 			fs.root.getDirectory(path, {create: false}, function(entry)
 			{
-				remove_file(entry, function(){
+				remove_file(entry, function()
+				{
+					// alert('le path est :' + path);
+					// alert('je termine par un finish_request dans if : ' +  error.name);
 	            	finish_request();
 				});
 			},
-			function(e)
+			function(error)
 			{
-    			fs_error_and_finish_request(e);
+				// 	alert('le path est :' + path);
+				// alert('je termine par un fs_error_and_finish_request dans if : ' + error.name);
+    			// fs_error_and_finish_request(error);
+    			fs_error_and_finish_request();
 			});
 		}
 		else
 		{
-			fs_error_and_finish_request(e);
+			// 		alert('le path est :' + path);
+			// alert('je termine par un fs_error_and_finish_request dans else : ' + error.name);
+			// fs_error_and_finish_request(error);
+			fs_error_and_finish_request();
 		}
 	});
 }
@@ -173,7 +185,7 @@ function delete_all() {
     fs_list(remove_file);
 }
 
-// Called only from delete_all.
+
 function remove_file(entry, callback) {
     if (!busy) throw 'remove_file is called without lock.';
 
