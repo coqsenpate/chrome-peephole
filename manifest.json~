@@ -7,7 +7,7 @@
     "default_popup": "popup.html"
   },
   "permissions": [
-    "tabs", "http://*/*", "https://*/*"
+    "tabs", "http://*/*", "https://*/*", "file://*/*"
   ],
   "manifest_version": 2
 }
