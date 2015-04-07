@@ -33,45 +33,6 @@ function command_filedir(request) {
     current.dir.push(request);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function command_show(node, nodeul) {
     // Set up the 'li' node for every entry.
     var li = document.createElement('li');
@@ -118,33 +79,6 @@ function command_show(node, nodeul) {
     li.appendChild(aDelete);
     nodeul.appendChild(li);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 function command_sort(dir) {
@@ -286,34 +220,6 @@ header.appendChild(headText);
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // set the Temporary/Persistent radio buttons
 var current_fstype = window.TEMPORARY;
 var temp = document.getElementById('temporary-radio');
@@ -331,47 +237,8 @@ del.addEventListener('click', function(e)
     		clear_field();
 			command_init();
 		})
-
 	};
-
-
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

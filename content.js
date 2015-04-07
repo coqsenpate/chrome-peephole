@@ -6,7 +6,10 @@ function show_log(str) {
     console.log.bind(console, 'Peephole (content):')(str);
 }
 
-var debug = true;
+
+var debug = false; // set debug mode on/off
+
+
 function show_debug(str) {
     if (debug)
         console.log.bind(console, 'Peephole:')(str);
@@ -129,23 +132,6 @@ function change_type(type) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function delete_single(path){
     show_debug('delete_single');
     if (!start_request()) return;
@@ -208,36 +194,6 @@ function remove_file(entry, callback) {
         }, fs_error);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 function check_usage(type) {
