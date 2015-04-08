@@ -134,7 +134,6 @@ function delete_all() {
 
 function delete_single(event) {
 	show_debug('eraseClicked_single');
-	console.log('>>>>>>>>>>>',event);
 	tmp = event.target.dataset.path;
 	send_request('delete_single', tmp, function(){
 		clear_field();
@@ -235,16 +234,20 @@ header.appendChild(headText);
 var current_fstype = window.TEMPORARY;
 var temp = document.getElementById('temporary-radio');
 var pers = document.getElementById('persistent-radio');
-var del = document.getElementById('file-list-body');
 temp.addEventListener('click', function() { change_type(window.TEMPORARY); });
 pers.addEventListener('click', function() { change_type(window.PERSISTENT); });
 
+
+
+// set the confirmation popup
 var confirmationPopup = document.getElementById('delete-all-confirmation');
 var confirmationPopupConfirmButton = document.getElementById('delete-all-confirmed');
 var confirmationPopupCancelButton = document.getElementById('delete-all-cancelled');
 
+
+
 // set the single file/folder delete button
-del.addEventListener('click', function(event)
+div.addEventListener('click', function(event) // >> 'file-list-body'
 {
 	if (event.target.classList.contains('deleteButton'))
 	{
@@ -275,16 +278,32 @@ del.addEventListener('click', function(event)
 
 // set the delete button
 var deleteAll = document.getElementById('delete-all');
-deleteAll.addEventListener('click', function() {
-  var elem = document.getElementById('delete-all-confirmation');
-  if (elem) {
-	document.getElementById('delete-all-confirmed').addEventListener(
-		'click', function() { delete_all(); elem.classList.add('hide'); });
-	document.getElementById('delete-all-cancelled').addEventListener(
-		'click', function() { elem.classList.add('hide'); });
-	elem.classList.remove('hide');
-  }
+deleteAll.addEventListener('click', function()
+{
+		var cleanup = function() {
+			confirmationPopupConfirmButton.removeEventListener('click', confirm);
+			confirmationPopupCancelButton.removeEventListener('click', cancel);
+		}
+
+		var confirm = function()
+		{
+			delete_all();
+			confirmationPopup.classList.add('hide');
+			cleanup();
+		}
+
+		var cancel = function()
+		{
+			confirmationPopup.classList.add('hide');
+			cleanup();
+		}
+
+		confirmationPopupConfirmButton.addEventListener('click', confirm);
+		confirmationPopupCancelButton.addEventListener('click', cancel);
+		confirmationPopup.classList.remove('hide');
 });
+
+
 
 function onMessage(request, sender, sendResponse) {
 	show_debug('FileSystem Explorer Extended (popup): onMessage:' + request.type, request);

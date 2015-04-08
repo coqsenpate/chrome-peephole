@@ -139,11 +139,9 @@ function delete_single(path){
 
 	fs.root.getFile(path, {create: false}, function(entry){
 		remove_file(entry, function(){
-			// alert('je termine correctement');
-			path='';
         	finish_request();
 		});
-        // finish_request();
+        finish_request();
 	}, function(error) {
 		if (error.name == 'TypeMismatchError')
 		{
@@ -151,24 +149,16 @@ function delete_single(path){
 			{
 				remove_file(entry, function()
 				{
-					// alert('le path est :' + path);
-					// alert('je termine par un finish_request dans if : ' +  error.name);
 	            	finish_request();
 				});
 			},
 			function(error)
 			{
-				// 	alert('le path est :' + path);
-				// alert('je termine par un fs_error_and_finish_request dans if : ' + error.name);
-    			// fs_error_and_finish_request(error);
     			fs_error_and_finish_request();
 			});
 		}
 		else
 		{
-			// 		alert('le path est :' + path);
-			// alert('je termine par un fs_error_and_finish_request dans else : ' + error.name);
-			// fs_error_and_finish_request(error);
 			fs_error_and_finish_request();
 		}
 	});
