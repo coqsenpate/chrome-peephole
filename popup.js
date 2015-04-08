@@ -46,7 +46,6 @@ function command_show(node, nodeul) {
 	entry.classList.add(node.type);
 	entry.classList.add('entry');
 	entry.appendChild(a);
-	entry.appendChild(aDelete);
 	a.appendChild(document.createTextNode(node.name));
 
 	if (node.type == 'file') {
@@ -55,6 +54,7 @@ function command_show(node, nodeul) {
 		divR.appendChild(file);
 		divR.classList.add('size');
 		entry.appendChild(divR);
+		entry.appendChild(aDelete);
 		a.setAttribute('target', '_');
 		a.setAttribute('href', node.url);
 	} else {
@@ -77,6 +77,7 @@ function command_show(node, nodeul) {
 			}
 		});
 		a.setAttribute('href', '#');
+		entry.appendChild(aDelete);
 	}
 	nodeul.appendChild(li);
 }
